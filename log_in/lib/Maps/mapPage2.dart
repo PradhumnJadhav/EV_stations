@@ -14,7 +14,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:log_in/Users%20services/login.dart';
 import 'package:web_socket_client/web_socket_client.dart';
 import 'package:firebase_database/firebase_database.dart';
- 
+ import 'dart:convert';
+import 'package:http/http.dart' as http; 
 
 final firebaseApp = Firebase.app();
 final rtdb = FirebaseDatabase.instanceFor(app: firebaseApp , databaseURL: 'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
@@ -93,25 +94,37 @@ pushData(int data,DatabaseReference ref,WebSocket socket){
 
 
   mapUpdate()async{
-  String uid='pj1';
-final ref = FirebaseDatabase.instance.ref();
- final lat= await ref.child('chargePoint/${uid}/lattitde').get();
-  final lng= await ref.child('chargePoint/${uid}/longitude').get();
- double ln=double.parse(lng.value.toString());
- double lt=double.parse(lat.value.toString());
- print(lt+ln);
-  myMarker.add(Marker(markerId: MarkerId("next"),
-   
-
-  position:LatLng(ln,lt),
-     infoWindow: const InfoWindow(
-            title: 'Cu   Location',
+ var url = "https://my-project-1579067571295-default-rtdb.firebaseio.com/"+"chargePoint.json"; 
+    // Do not remove “data.json”,keep it as it is 
+    try { 
+      final response = await http.get(Uri.parse(url)); 
+      final extractedData = json.decode(response.body) as Map<String, dynamic>; 
+      if (extractedData == null) { 
+        return; 
+      } 
+      extractedData.forEach((key, value) { 
+      //  tableData.add([value['chargingPointVendor'],value['chargingPointModel'],'available','0']);
+      double ln=double.parse(value['longitude'].toString());
+       double lt=double.parse(value['lattitde'].toString());
+       print(ln);
+       print(lt);
+       int markerid=1;
+myMarker.add(
+      Marker(
+          markerId: MarkerId("id_${markerid}"),
+          position: LatLng(lt, ln),
+          
+          infoWindow: const InfoWindow(
+            title: 'EV Station',
             
-            
-          )
-  ),
-  );
-}
+          )),
+    );
+      }); 
+       
+    } catch (error) { 
+      throw error; 
+    } 
+     }
 
   final List<Marker> myMarker = [];
   final List<Marker> markerList = [
@@ -122,7 +135,7 @@ final ref = FirebaseDatabase.instance.ref();
     super.initState();
     myMarker.addAll(markerList);
     packdata();
-    // mapUpdate();
+     mapUpdate();
   }
 
   Future<Position> getUserLocation() async {
@@ -143,7 +156,7 @@ final ref = FirebaseDatabase.instance.ref();
       // print('${value.latitude} ${value.longitude}');
   
       myMarker.add(Marker(
-          markerId: MarkerId('Second'),
+          markerId: MarkerId('first'),
           position: LatLng(value.latitude, value.longitude),
           
           infoWindow: const InfoWindow(

@@ -13,7 +13,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:log_in/Users%20services/login.dart';
 import 'package:web_socket_client/web_socket_client.dart';
 import 'package:firebase_database/firebase_database.dart';
-
+import 'dart:convert';
+import 'package:http/http.dart' as http; 
+import 'package:profile/profile.dart';
 final firebaseApp = Firebase.app();
 final rtdb = FirebaseDatabase.instanceFor(
     app: firebaseApp,
@@ -23,7 +25,8 @@ final rtdb = FirebaseDatabase.instanceFor(
 final socket = WebSocket(Uri.parse('ws://172.20.25.116:9000/test1'),
     timeout: Duration(seconds: 30));
 
-LatLng tempPos = LatLng(22.7196, 75.8577);
+
+
 
 class SimpleMap extends StatefulWidget {
   @override
@@ -38,11 +41,17 @@ class _SimpleMapState extends State<SimpleMap> {
 
   final TextEditingController _serverController = TextEditingController();
 
-  pushData(int data, DatabaseReference ref, WebSocket socket) {
+
+String userName ="";
+String userEmail="" ;
+
+  pushData(int data, DatabaseReference ref, WebSocket socket)async {
     socket.send('[2, "12345", "Authorize", { "idTag":"pradhumn"   }]');
     socket.messages.listen((message) {
       print(message);
     });
+   
+
     Navigator.pushNamed(context, 'chargePointHome');
   }
 
@@ -64,32 +73,96 @@ class _SimpleMapState extends State<SimpleMap> {
   }
 
   mapUpdate() async {
-    String uid = 'pj1';
-    final ref = FirebaseDatabase.instance.ref();
-    final lat = await ref.child('chargePoint/${uid}/lattitde').get();
-    final lng = await ref.child('chargePoint/${uid}/longitude').get();
-    double ln = double.parse(lng.value.toString());
-    double lt = double.parse(lat.value.toString());
-    print(lt + ln);
-    myMarker.add(
-      Marker(
-          markerId: MarkerId("next"),
-          position: LatLng(ln, lt),
+ final user =  await FirebaseAuth.instance.currentUser;
+    userEmail="${user?.email}";
+    userName='${user?.email}';
+
+    final List<Marker> mark = [];
+   var url = "https://my-project-1579067571295-default-rtdb.firebaseio.com/"+"chargePoint.json"; 
+    // Do not remove “data.json”,keep it as it is 
+    try { 
+      final response = await http.get(Uri.parse(url)); 
+      final extractedData = json.decode(response.body) as Map<String, dynamic>; 
+      if (extractedData == null) { 
+        return; 
+      } 
+      extractedData.forEach((key, value) { 
+      //  tableData.add([value['chargingPointVendor'],value['chargingPointModel'],'available','0']);
+       
+    
+       
+        
+        
+      final mar=Marker(
+        onTap: () {
+           
+        },
+          markerId: MarkerId(value['uid']),
+          position: LatLng(double.parse(value['lattitde'].toString() ),double.parse(value['longitude'].toString() )),
+          
           infoWindow: const InfoWindow(
-            title: 'Cu   Location',
-          )),
-    );
+            title: 'EV Station',
+            
+          ));
+         myMarker.add(mar);
+
+          
+    });
+       
+       
+    } catch (error) { 
+      throw error;
+    } 
+
+
+    
+    return mark;
   }
+
+getProfile()async{
+  
+   var url = "https://my-project-1579067571295-default-rtdb.firebaseio.com/"+"user.json"; 
+    // Do not remove “data.json”,keep it as it is 
+    try { 
+      final response = await http.get(Uri.parse(url)); 
+      final extractedData = json.decode(response.body) as Map<String, dynamic>; 
+      if (extractedData == null) { 
+        return; 
+      } 
+      extractedData.forEach((key, value) { 
+       
+       if(value['email'].toString()==userEmail){
+        userName=value['name'];
+       }
+       
+    
+       
+       
+}) ;
+    } catch (error) { 
+      throw error; 
+    } 
+
+
+    
+ 
+
+
+}
 
   final List<Marker> myMarker = [];
   final List<Marker> markerList = [];
+  
 
+ 
   @override
   void initState() {
-    super.initState();
+     super.initState();
+    mapUpdate();
     myMarker.addAll(markerList);
     packdata();
-    // mapUpdate();
+    getProfile();
+   
   }
 
   Future<Position> getUserLocation() async {
@@ -109,11 +182,12 @@ class _SimpleMapState extends State<SimpleMap> {
       // print('${value.latitude} ${value.longitude}');
 
       myMarker.add(Marker(
-          markerId: MarkerId('Second'),
+          markerId: MarkerId('first'),
           position: LatLng(value.latitude, value.longitude),
           infoWindow: const InfoWindow(
             title: 'Current Location',
           )));
+           
 
       CameraPosition cameraPosition = CameraPosition(
         target: LatLng(value.latitude, value.longitude ),
@@ -134,10 +208,11 @@ class _SimpleMapState extends State<SimpleMap> {
         appBar: AppBar(
           title: const Text('EV Charging station',
               style: TextStyle(
-                  letterSpacing: 1.5, fontSize: 20, color: Colors.red)),
+                  letterSpacing: 1.5, fontSize: 20, color: Color.fromARGB(255, 235, 232, 232))),
           elevation: 0,
-          backgroundColor: Color.fromRGBO(250, 226, 131, 1),
+          backgroundColor: Color.fromRGBO(10, 119, 208, 1),
         ),
+      
         drawer: Drawer(
           child: ListView(
             children: [
@@ -153,7 +228,7 @@ class _SimpleMapState extends State<SimpleMap> {
               //     padding: EdgeInsets.only(left: 8.0),
 
               //   ),
-
+                  
               Container(
                   padding: EdgeInsets.only(
                       top: MediaQuery.of(context).padding.top, bottom: 20),
@@ -166,22 +241,19 @@ class _SimpleMapState extends State<SimpleMap> {
                       SizedBox(
                         height: 15,
                       ),
-                      Text(
-                        "Pradhumn Jadhav",
-                        style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(255, 61, 41, 218)),
-                      ),
-                      Text(
-                        "pradhumnpj1237@gmail.com",
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: Color.fromARGB(255, 61, 41, 218)),
-                      ),
+                    
+                    
+                      
                     ],
                   )),
-               
+                 Container(
+                       child: Text(userName, style: TextStyle(fontSize:40),textAlign:TextAlign.center),
+
+                    ),
+                    Container(
+                       child: Text(userEmail, style: TextStyle(fontSize:20),textAlign:TextAlign.center,)
+
+                    ),
                   Container(
                     child: TextButton(
                       onPressed: () {
@@ -193,8 +265,8 @@ class _SimpleMapState extends State<SimpleMap> {
                         'Stations Nearby',
                         textAlign: TextAlign.left,
                         style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            color: Color.fromARGB(255, 236, 44, 10),
+                            // decoration: TextDecoration.underline,
+                            color:Colors.white,
                             fontSize: 23),
                       ),
                       style: ButtonStyle(),
@@ -210,8 +282,8 @@ class _SimpleMapState extends State<SimpleMap> {
                         'Refresh',
                         textAlign: TextAlign.left,
                         style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            color: Colors.red,
+                            // decoration: TextDecoration.underline,
+                            color: Colors.white,
                             fontSize: 23),
                       ),
                       style: ButtonStyle(),
@@ -225,8 +297,8 @@ class _SimpleMapState extends State<SimpleMap> {
                       'Satellite',
                       textAlign: TextAlign.left,
                       style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: Colors.red,
+                          // decoration: TextDecoration.underline,
+                          color: Colors.white,
                           fontSize: 23),
                     ),
                     style: ButtonStyle(),
@@ -239,8 +311,8 @@ class _SimpleMapState extends State<SimpleMap> {
                       'Sign Out',
                       textAlign: TextAlign.left,
                       style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: Colors.red,
+                          // decoration: TextDecoration.underline,
+                          color:Colors.white,
                           fontSize: 23),
                     ),
                     style: ButtonStyle(),
@@ -248,7 +320,7 @@ class _SimpleMapState extends State<SimpleMap> {
                 ],
               
           ),
-          backgroundColor: Color.fromRGBO(189, 237, 190, 1),
+          backgroundColor:Color.fromRGBO(10, 119, 208, 1),
         ),
         body: Stack(children: [
           GoogleMap(

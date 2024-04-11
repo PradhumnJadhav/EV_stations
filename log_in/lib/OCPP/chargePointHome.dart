@@ -3,33 +3,78 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:log_in/OCPP/chargePoint.dart'; 
+import 'dart:convert';
+import 'package:http/http.dart' as http; 
 final firebaseApp = Firebase.app();
 final rtdb = FirebaseDatabase.instanceFor(app: firebaseApp, databaseURL: 'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
 
 
- List<List<String>> tableData = [
- ['chargingPointVendor', 'chargingPointModel', 'Status', 'EnergyUsed'],
-  ];
+
  class ChargePointHome extends StatefulWidget {
   @override
   _ChargePointHome createState() => _ChargePointHome();
 }
 
 class _ChargePointHome extends State<ChargePointHome> {
-
+ List<List<String>> tableData = [
+ ['chargingPointVendor', 'chargingPointModel', 'Status', 'EnergyUsed'],
+  ];
+  
+  void initState() { 
+    super.initState(); 
+     
+  readData();  
+  } 
+  
+  bool isLoading = true; 
+ 
+  Future<void> readData() async { 
+      
+    // Please replace the Database URL 
+    // which we will get in “Add Realtime Database”  
+    // step with DatabaseURL 
+      
+    var url = "https://my-project-1579067571295-default-rtdb.firebaseio.com/"+"chargePoint.json"; 
+   
+    try { 
+      final response = await http.get(Uri.parse(url)); 
+      final extractedData = json.decode(response.body) as Map<String, dynamic>; 
+      if (extractedData == null) { 
+        return; 
+      } 
+      extractedData.forEach((key, value) { 
+       tableData.add([value['chargingPointVendor'].toString(),value['chargingPointModel'].toString(),'available','0']);
+      }); 
+      setState(() { 
+        isLoading = false; 
+      }); 
+    } catch (error) { 
+      print(error); 
+    } 
+  } 
 
  
 
 
    addToTable()async{
    
-            final ref = FirebaseDatabase.instance.ref();
-    final vendorname = await ref.child('chargePoint/pj1/chargingPointVendor').get();
-final modelname = await ref.child('chargePoint/pj1/chargingPointModel').get();
+            // final ref = FirebaseDatabase.instance.ref();
+//     final vendorname = await ref.child('chargePoint/pj1/chargingPointVendor').get();
+// final modelname = await ref.child('chargePoint/pj1/chargingPointModel').get();
 
- 
 
-            tableData.add([  vendorname.value.toString() ,modelname.value.toString(), 'Unavailable', '0 kWh']);
+//   ref.onValue.listen((event) {
+//   for (final child in event.snapshot.children) {
+//      final vendorname =  child.child('chargingVendor');
+// final modelname = child.child('chargingPoint/chargingPointModel');
+// tableData.add([  vendorname.value.toString() ,modelname.value.toString(), 'Unavailable', '0 kWh']);
+//   }
+// }, onError: (error) {
+//  print('error');
+// });
+
+//  print('hii');
+//             tableData.add([  vendorname.value.toString() ,modelname.value.toString(), 'Unavailable', '0 kWh']);
           
 
 
@@ -69,10 +114,12 @@ final modelname = await ref.child('chargePoint/pj1/chargingPointModel').get();
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-            Navigator.pushNamed(context, 'chargePoint');
+          addToTable();
+             Navigator.pushNamed(context, 'chargePoint');
            },
-        child: Icon(Icons.add),
+        child: Icon(Icons.dangerous),
       ),
+      
     );
   }
 }
