@@ -21,7 +21,7 @@ class _MyLoginState extends State<MyLogin> {
       return UiHelper.customAlertBox(context, AppLocalizations.of(context)!.warning);
     } else {
       UserCredential? usercredential;
-
+         
       try {
         usercredential = await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password)

@@ -59,7 +59,7 @@ if (FirebaseAuth.instance.currentUser != null) {
         width: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.green,Colors.blue],
+            colors: [Color.fromARGB(255, 223, 128, 3),Colors.blue],
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
             ),

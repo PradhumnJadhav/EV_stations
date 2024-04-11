@@ -43,6 +43,7 @@ print(path);
         body: Column  (
 
           children:[
+            
             TextField(
                             controller:uid,
                             style: TextStyle(),
@@ -111,6 +112,7 @@ print(path);
          FloatingActionButton(
         onPressed: () {
           putDataCP(vendor,model,uid,rtdb);
+            Navigator.pushNamed(context, 'chargePointHome');
         },
         child: Text('Add'),
       ),

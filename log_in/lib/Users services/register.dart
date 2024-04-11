@@ -1,8 +1,18 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:log_in/Helpers/ui_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_core/firebase_core.dart';
+ 
 
+final firebaseApp = Firebase.app();
+final rtdb = FirebaseDatabase.instanceFor(
+    app: firebaseApp,
+    databaseURL:
+        'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
 class MyRegister extends StatefulWidget {
   const MyRegister({Key? key}) : super(key: key);
 
@@ -15,6 +25,15 @@ class _MyRegisterState extends State<MyRegister> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController nameController = TextEditingController();
 
+extendProfile(String email,String name)async{
+ 
+
+  String  path='user/' +name  ;
+
+DatabaseReference ref = FirebaseDatabase.instance.ref(path);
+await ref.set({'name':name ,'email':email});
+}
+   
   signUp(String email, String password, String name) async {
     if (email == "" || password == "" || name == "") {
       UiHelper.customAlertBox(context, AppLocalizations.of(context)!.warning);
@@ -172,6 +191,7 @@ class _MyRegisterState extends State<MyRegister> {
                                 child: IconButton(
                                     color: Colors.white,
                                     onPressed: () {
+                                      extendProfile(emailController.text.toString(),nameController.text.toString());
                                       signUp(
                                           emailController.text.toString(),
                                           passwordController.text.toString(),
