@@ -16,6 +16,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http; 
 import 'package:profile/profile.dart';
+import 'package:google_maps_flutter_platform_interface/src/types/bitmap.dart';
 final firebaseApp = Firebase.app();
 final rtdb = FirebaseDatabase.instanceFor(
     app: firebaseApp,
@@ -80,6 +81,9 @@ String userEmail="" ;
     final List<Marker> mark = [];
    var url = "https://my-project-1579067571295-default-rtdb.firebaseio.com/"+"chargePoint.json"; 
     // Do not remove “data.json”,keep it as it is 
+
+  BitmapDescriptor markerIcon = await BitmapDescriptor.fromAssetImage(const ImageConfiguration(), 'assets/charging.png');
+
     try { 
       final response = await http.get(Uri.parse(url)); 
       final extractedData = json.decode(response.body) as Map<String, dynamic>; 
@@ -90,7 +94,7 @@ String userEmail="" ;
       //  tableData.add([value['chargingPointVendor'],value['chargingPointModel'],'available','0']);
        
     
-       
+      
         
         
       final mar=Marker(
@@ -99,7 +103,7 @@ String userEmail="" ;
         },
           markerId: MarkerId(value['uid']),
           position: LatLng(double.parse(value['lattitde'].toString() ),double.parse(value['longitude'].toString() )),
-          
+          icon: markerIcon,
           infoWindow: const InfoWindow(
             title: 'EV Station',
             
@@ -107,7 +111,8 @@ String userEmail="" ;
          myMarker.add(mar);
 
           
-    });
+      }
+    );
        
        
     } catch (error) { 

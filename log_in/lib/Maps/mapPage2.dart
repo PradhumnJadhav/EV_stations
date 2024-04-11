@@ -81,6 +81,10 @@ String userEmail="" ;
     final List<Marker> mark = [];
    var url = "https://my-project-1579067571295-default-rtdb.firebaseio.com/"+"chargePoint.json"; 
     // Do not remove “data.json”,keep it as it is 
+
+  BitmapDescriptor markerIcon = await BitmapDescriptor.fromAssetImage(const ImageConfiguration(size: Size.fromRadius(2)), 'assets/charging.png');
+
+
     try { 
       final response = await http.get(Uri.parse(url)); 
       final extractedData = json.decode(response.body) as Map<String, dynamic>; 
@@ -100,7 +104,7 @@ String userEmail="" ;
         },
           markerId: MarkerId(value['uid']),
           position: LatLng(double.parse(value['lattitde'].toString() ),double.parse(value['longitude'].toString() )),
-          
+          icon: markerIcon,
           infoWindow: const InfoWindow(
             title: 'EV Station',
             
