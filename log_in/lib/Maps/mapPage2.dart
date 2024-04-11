@@ -14,24 +14,18 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:log_in/Users%20services/login.dart';
 import 'package:web_socket_client/web_socket_client.dart';
 import 'package:firebase_database/firebase_database.dart';
- import 'dart:convert';
+import 'dart:convert';
 import 'package:http/http.dart' as http; 
-
+import 'package:profile/profile.dart';
 final firebaseApp = Firebase.app();
-final rtdb = FirebaseDatabase.instanceFor(app: firebaseApp , databaseURL: 'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
+final rtdb = FirebaseDatabase.instanceFor(
+    app: firebaseApp,
+    databaseURL:
+        'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
 
-final socket = WebSocket(Uri.parse('ws://172.20.25.116:9000/test1'),timeout: Duration(seconds: 30));
+final socket = WebSocket(Uri.parse('ws://172.20.25.116:9000/test1'),
+    timeout: Duration(seconds: 30));
 
-
-LatLng tempPos = LatLng(22.7196,75.8577);
-
-
-
-
- 
-
- 
- 
 
 
 
@@ -41,36 +35,26 @@ class SimpleMap1 extends StatefulWidget {
 }
 
 class _SimpleMapState extends State<SimpleMap1> {
- 
-
- 
-
   final Completer<GoogleMapController> _controller = Completer();
 
   static const CameraPosition _kInitialPosition = CameraPosition(
-      target: LatLng(23.25941, 77.41225),
-      zoom: 4,
-      tilt: 0,
-      bearing: 0);
+      target: LatLng(23.25941, 77.41225), zoom: 4, tilt: 0, bearing: 0);
 
-final TextEditingController _serverController = TextEditingController();
- 
-  
-
-     
-  
-pushData(int data,DatabaseReference ref,WebSocket socket){
-
-  socket.send('[2, "12345", "Authorize", { "idTag":"pradhumn"   }]');
-   socket.messages.listen((message) {
-   print(message);
-});
-   Navigator.pushNamed(context, 'chargePointHome');
+  final TextEditingController _serverController = TextEditingController();
 
 
- 
+String userName ="";
+String userEmail="" ;
+
+  pushData(int data, DatabaseReference ref, WebSocket socket)async {
+    socket.send('[2, "12345", "Authorize", { "idTag":"pradhumn"   }]');
+    socket.messages.listen((message) {
+      print(message);
+    });
+   
+
+    Navigator.pushNamed(context, 'chargePointHome');
   }
-
 
   signOut() async {
     await FirebaseAuth.instance.signOut();
@@ -81,20 +65,21 @@ pushData(int data,DatabaseReference ref,WebSocket socket){
     );
   }
 
-
   mapnorm() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => SimpleMap(),
       ),
     );
-     
   }
 
+  mapUpdate() async {
+ final user =  await FirebaseAuth.instance.currentUser;
+    userEmail="${user?.email}";
+    userName='${user?.email}';
 
-
-  mapUpdate()async{
- var url = "https://my-project-1579067571295-default-rtdb.firebaseio.com/"+"chargePoint.json"; 
+    final List<Marker> mark = [];
+   var url = "https://my-project-1579067571295-default-rtdb.firebaseio.com/"+"chargePoint.json"; 
     // Do not remove “data.json”,keep it as it is 
     try { 
       final response = await http.get(Uri.parse(url)); 
@@ -104,38 +89,81 @@ pushData(int data,DatabaseReference ref,WebSocket socket){
       } 
       extractedData.forEach((key, value) { 
       //  tableData.add([value['chargingPointVendor'],value['chargingPointModel'],'available','0']);
-      double ln=double.parse(value['longitude'].toString());
-       double lt=double.parse(value['lattitde'].toString());
-       print(ln);
-       print(lt);
-       int markerid=1;
-myMarker.add(
-      Marker(
-          markerId: MarkerId("id_${markerid}"),
-          position: LatLng(lt, ln),
+       
+    
+       
+        
+        
+      final mar=Marker(
+        onTap: () {
+           
+        },
+          markerId: MarkerId(value['uid']),
+          position: LatLng(double.parse(value['lattitde'].toString() ),double.parse(value['longitude'].toString() )),
           
           infoWindow: const InfoWindow(
             title: 'EV Station',
             
-          )),
-    );
-      }); 
+          ));
+         myMarker.add(mar);
+
+          
+    });
        
+       
+    } catch (error) { 
+      throw error;
+    } 
+
+
+    
+    return mark;
+  }
+
+getProfile()async{
+  
+   var url = "https://my-project-1579067571295-default-rtdb.firebaseio.com/"+"user.json"; 
+    // Do not remove “data.json”,keep it as it is 
+    try { 
+      final response = await http.get(Uri.parse(url)); 
+      final extractedData = json.decode(response.body) as Map<String, dynamic>; 
+      if (extractedData == null) { 
+        return; 
+      } 
+      extractedData.forEach((key, value) { 
+       
+       if(value['email'].toString()==userEmail){
+        userName=value['name'];
+       }
+       
+    
+       
+       
+}) ;
     } catch (error) { 
       throw error; 
     } 
-     }
+
+
+    
+ 
+
+
+}
 
   final List<Marker> myMarker = [];
-  final List<Marker> markerList = [
-  ];
+  final List<Marker> markerList = [];
+  
 
+ 
   @override
   void initState() {
-    super.initState();
+     super.initState();
+    mapUpdate();
     myMarker.addAll(markerList);
     packdata();
-     mapUpdate();
+    getProfile();
+   
   }
 
   Future<Position> getUserLocation() async {
@@ -147,26 +175,23 @@ myMarker.add(
 
     return await Geolocator.getCurrentPosition();
   }
-      
- 
-//  
+
+//
   packdata() {
     getUserLocation().then((value) async {
       // print('My Location');
       // print('${value.latitude} ${value.longitude}');
-  
+
       myMarker.add(Marker(
           markerId: MarkerId('first'),
           position: LatLng(value.latitude, value.longitude),
-          
           infoWindow: const InfoWindow(
             title: 'Current Location',
-            
-            
           )));
-          
+           
+
       CameraPosition cameraPosition = CameraPosition(
-        target: LatLng(value.latitude, value.longitude),
+        target: LatLng(value.latitude, value.longitude ),
         zoom: 15,
       );
 
@@ -178,20 +203,17 @@ myMarker.add(
     });
   }
 
- 
-
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text(
-            'EV Charging station',
-            style:TextStyle(letterSpacing: 1.5, fontSize: 20, color: Colors.red)
-          ),
+          title: const Text('EV Charging station',
+              style: TextStyle(
+                  letterSpacing: 1.5, fontSize: 20, color: Color.fromARGB(255, 235, 232, 232))),
           elevation: 0,
-          backgroundColor: Color.fromRGBO(250, 226, 131, 1),
+          backgroundColor: Color.fromRGBO(10, 119, 208, 1),
         ),
-        
+      
         drawer: Drawer(
           child: ListView(
             children: [
@@ -205,111 +227,102 @@ myMarker.add(
               //     ),
               //     color: Color.fromRGBO(250, 226, 131, 1),
               //     padding: EdgeInsets.only(left: 8.0),
-                  
-                
+
               //   ),
-
-            Container(
-            padding: EdgeInsets.only(
-                top: MediaQuery.of(context).padding.top, bottom: 20),
-            child: const Column(
-              children: [
-                CircleAvatar(
-                  radius: 52,
-                  child: const Icon(Icons.person_2_rounded),
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Text(
-                  "Pradhumn Jadhav",
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 61, 41, 218)),
-                ),
-                Text(
-                  "pradhumnpj1237@gmail.com",
-                  style: TextStyle(fontSize: 18, color: Color.fromARGB(255, 61, 41, 218)),
-                ),
-            ],
-            
-          )
-          ),
+                  
               Container(
-                  child: TextButton(
-            onPressed: () {
-                 DatabaseReference ref = FirebaseDatabase.instance.ref("users/123");
-                  pushData(12, ref,socket);
+                  padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top, bottom: 20),
+                  child: const Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 52,
+                        child: const Icon(Icons.person_2_rounded),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                    
+                    
+                      
+                    ],
+                  )),
+                 Container(
+                       child: Text(userName, style: TextStyle(fontSize:30),textAlign:TextAlign.center),
 
-               
-            },
-            child: Text(
-               'Stations Nearby',
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                  decoration: TextDecoration.underline,
-                  color: Color.fromARGB(255, 236, 44, 10),
-                  fontSize: 23),
-            ),
-            style: ButtonStyle(),
+                    ),
+                    Container(
+                       child: Text(userEmail, style: TextStyle(fontSize:20),textAlign:TextAlign.center,)
+
+                    ),
+                  Container(
+                    child: TextButton(
+                      onPressed: () {
+                        DatabaseReference ref =
+                            FirebaseDatabase.instance.ref("users/123");
+                        pushData(12, ref, socket);
+                      },
+                      child: Text(
+                        'Stations Nearby',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            // decoration: TextDecoration.underline,
+                            color:Colors.white,
+                            fontSize: 23),
+                      ),
+                      style: ButtonStyle(),
+                    ),
+                  ),
+                  Container(
+                    // padding:EdgeInsets.only(top: 625),
+                    child: TextButton(
+                      onPressed: () {
+                        mapUpdate();
+                      },
+                      child: Text(
+                        'Refresh',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            // decoration: TextDecoration.underline,
+                            color: Colors.white,
+                            fontSize: 23),
+                      ),
+                      style: ButtonStyle(),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      mapnorm();
+                    },
+                    child: Text(
+                      'Normal',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          // decoration: TextDecoration.underline,
+                          color: Colors.white,
+                          fontSize: 23),
+                    ),
+                    style: ButtonStyle(),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      signOut();
+                    },
+                    child: Text(
+                      'Sign Out',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          // decoration: TextDecoration.underline,
+                          color:Colors.white,
+                          fontSize: 23),
+                    ),
+                    style: ButtonStyle(),
+                  ),
+                ],
+              
           ),
-                 ),
-              Container(
-                // padding:EdgeInsets.only(top: 625),
-                child: TextButton(
-                onPressed: () {
-                   mapUpdate();
-                 
-                },
-                child: Text(
-                  
-                  'Refresh',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: Colors.red,
-                      fontSize: 23),
-                ),
-                style: ButtonStyle(),
-              ),
-              ),
-              TextButton(
-                onPressed: () {
-                  mapnorm();
-                },
-                child: Text(
-                  
-                  'Normal',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: Colors.red,
-                      fontSize: 23),
-                ),
-                style: ButtonStyle(),
-              ),
-              TextButton(
-                onPressed: () {
-                  signOut();
-                },
-                child: Text(
-                  
-                  'Sign Out',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      color: Colors.red,
-                      fontSize: 23),
-                ),
-                style: ButtonStyle(),
-              ),
-            ],
-          ),
-          backgroundColor: Color.fromRGBO(189, 237, 190, 1),
-          
+          backgroundColor:Color.fromRGBO(10, 119, 208, 1),
         ),
-        
         body: Stack(children: [
           GoogleMap(
             initialCameraPosition: _kInitialPosition,
@@ -320,19 +333,15 @@ myMarker.add(
             },
           ),
           Container(
-                padding: EdgeInsets.fromLTRB(8.0, 700, 0, 0),
-                child: FloatingActionButton(
-                  
-                  onPressed: () {
-                    packdata();
-                  },
-                  child: const Icon(Icons.radio_button_checked_sharp),
-                  backgroundColor: Color.fromARGB(255, 255, 255, 255),
-                ),
-              ),
-        ]
-      )
-      
-    );
+            padding: EdgeInsets.fromLTRB(8.0, 700, 0, 0),
+            child: FloatingActionButton(
+              onPressed: () {
+                packdata();
+              },
+              child: const Icon(Icons.radio_button_checked_sharp),
+              backgroundColor: Color.fromARGB(255, 255, 255, 255),
+            ),
+          ),
+        ]));
   }
 }
