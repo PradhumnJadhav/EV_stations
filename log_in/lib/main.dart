@@ -29,6 +29,7 @@ void main() async {
       'resetPassword':(context)=> ResetPasswordPage(),
       'chargePoint' :(context) => ChargePoint(),
       'chargePointHome' :(context) => ChargePointHome(),
+      'SimpleMap' :(context) => SimpleMap(),
       
     },
     supportedLocales: L10n.all,

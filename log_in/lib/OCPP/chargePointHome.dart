@@ -56,7 +56,7 @@ class _ChargePointHome extends State<ChargePointHome> {
  
 
 
-   addToTable()async{
+   
    
             // final ref = FirebaseDatabase.instance.ref();
 //     final vendorname = await ref.child('chargePoint/pj1/chargingPointVendor').get();
@@ -78,7 +78,7 @@ class _ChargePointHome extends State<ChargePointHome> {
           
 
 
-}
+
 
  
 @override
@@ -112,13 +112,7 @@ class _ChargePointHome extends State<ChargePointHome> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          addToTable();
-             Navigator.pushNamed(context, 'chargePoint');
-           },
-        child: Icon(Icons.dangerous),
-      ),
+      
       
     );
   }

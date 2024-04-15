@@ -73,6 +73,10 @@ String userEmail="" ;
     );
   }
 
+  addTodata() async{
+    Navigator.pushNamed(context, 'chargePoint');
+  }
+
   mapUpdate() async {
  final user =  await FirebaseAuth.instance.currentUser;
     userEmail="${user?.email}";
@@ -210,122 +214,100 @@ getProfile()async{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        
+      
+        drawer: Drawer(
+          child: ListView(
+            children: [
+                  UserAccountsDrawerHeader(
+                    accountName: Text(userName, style: TextStyle(fontSize:22)),
+                    accountEmail: Text(userEmail, style: TextStyle(fontSize:12)),
+                    currentAccountPicture: CircleAvatar(
+                        radius: 25,
+                        child: const Icon(Icons.person_2_rounded),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(10, 119, 208, 1),
+                      ),
+
+                  ),
+
+                  ListTile(
+                    leading: Icon(Icons.add_location),
+                    title: Text(
+                        'Stations Nearby',
+                        style: TextStyle(
+                            // decoration: TextDecoration.underline,
+                            color:Colors.black,
+                            fontSize: 23),
+                      ),
+                    onTap: () {
+                        DatabaseReference ref =
+                            FirebaseDatabase.instance.ref("users/123");
+                        pushData(12, ref, socket);
+                      },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.compare_outlined),
+                    title: Text(
+                      'Satellite',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          // decoration: TextDecoration.underline,
+                          color: Colors.black,
+                          fontSize: 23),
+                    ),
+                    onTap: mapsat,
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.autorenew),
+                    title: Text(
+                        'Refresh',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            // decoration: TextDecoration.underline,
+                            color: Colors.black,
+                            fontSize: 23),
+                      ),
+                      onTap: mapUpdate,
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.library_add_outlined),
+                    title: Text(
+                      'List a Charger',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          // decoration: TextDecoration.underline,
+                          color: Colors.black,
+                          fontSize: 23),
+                    ),
+                    onTap: addTodata,
+
+                  ),
+                  
+                  ListTile(
+                    leading: Icon(Icons.exit_to_app),
+                    title: Text(
+                      'Sign Out',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          // decoration: TextDecoration.underline,
+                          color:Colors.black,
+                          fontSize: 23),
+                    ),
+                    onTap: signOut,
+                  ),
+                ],
+              
+          ),
+          backgroundColor:Color.fromRGBO(230, 224, 224, 1),
+        ),
         appBar: AppBar(
           title: const Text('EV Charging station',
               style: TextStyle(
                   letterSpacing: 1.5, fontSize: 20, color: Color.fromARGB(255, 235, 232, 232))),
           elevation: 0,
           backgroundColor: Color.fromRGBO(10, 119, 208, 1),
-        ),
-      
-        drawer: Drawer(
-          child: ListView(
-            children: [
-              //  Container(
-              //   child: Text(
-              //     "MENU",
-              //     style: TextStyle(
-              //         fontSize: 30,
-              //         fontWeight: FontWeight.bold,
-              //         color: Color.fromARGB(255, 15, 15, 15)),
-              //     ),
-              //     color: Color.fromRGBO(250, 226, 131, 1),
-              //     padding: EdgeInsets.only(left: 8.0),
-
-              //   ),
-                  
-              Container(
-                  padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top, bottom: 20),
-                  child: const Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 52,
-                        child: const Icon(Icons.person_2_rounded),
-                      ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                    
-                    
-                      
-                    ],
-                  )),
-                 Container(
-                       child: Text(userName, style: TextStyle(fontSize:30),textAlign:TextAlign.center),
-
-                    ),
-                    Container(
-                       child: Text(userEmail, style: TextStyle(fontSize:20),textAlign:TextAlign.center,)
-
-                    ),
-                  Container(
-                    child: TextButton(
-                      onPressed: () {
-                        DatabaseReference ref =
-                            FirebaseDatabase.instance.ref("users/123");
-                        pushData(12, ref, socket);
-                      },
-                      child: Text(
-                        'Stations Nearby',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            // decoration: TextDecoration.underline,
-                            color:Colors.white,
-                            fontSize: 23),
-                      ),
-                      style: ButtonStyle(),
-                    ),
-                  ),
-                  Container(
-                    // padding:EdgeInsets.only(top: 625),
-                    child: TextButton(
-                      onPressed: () {
-                        mapUpdate();
-                      },
-                      child: Text(
-                        'Refresh',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            // decoration: TextDecoration.underline,
-                            color: Colors.white,
-                            fontSize: 23),
-                      ),
-                      style: ButtonStyle(),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      mapsat();
-                    },
-                    child: Text(
-                      'Satellite',
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                          // decoration: TextDecoration.underline,
-                          color: Colors.white,
-                          fontSize: 23),
-                    ),
-                    style: ButtonStyle(),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      signOut();
-                    },
-                    child: Text(
-                      'Sign Out',
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                          // decoration: TextDecoration.underline,
-                          color:Colors.white,
-                          fontSize: 23),
-                    ),
-                    style: ButtonStyle(),
-                  ),
-                ],
-              
-          ),
-          backgroundColor:Color.fromRGBO(10, 119, 208, 1),
         ),
         body: Stack(children: [
           GoogleMap(
@@ -346,6 +328,7 @@ getProfile()async{
               backgroundColor: Color.fromARGB(255, 255, 255, 255),
             ),
           ),
+          
         ]));
   }
 }

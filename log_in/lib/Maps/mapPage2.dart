@@ -17,6 +17,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http; 
 import 'package:profile/profile.dart';
+import 'package:google_maps_flutter_platform_interface/src/types/bitmap.dart';
 final firebaseApp = Firebase.app();
 final rtdb = FirebaseDatabase.instanceFor(
     app: firebaseApp,
@@ -64,6 +65,9 @@ String userEmail="" ;
       ),
     );
   }
+  addTodata() async{
+    Navigator.pushNamed(context, 'chargePoint');
+  }
 
   mapnorm() {
     Navigator.of(context).pushReplacement(
@@ -82,8 +86,7 @@ String userEmail="" ;
    var url = "https://my-project-1579067571295-default-rtdb.firebaseio.com/"+"chargePoint.json"; 
     // Do not remove “data.json”,keep it as it is 
 
-  BitmapDescriptor markerIcon = await BitmapDescriptor.fromAssetImage(const ImageConfiguration(size: Size.fromRadius(2)), 'assets/charging.png');
-
+  BitmapDescriptor markerIcon = await BitmapDescriptor.fromAssetImage(const ImageConfiguration(), 'assets/charging.png');
 
     try { 
       final response = await http.get(Uri.parse(url)); 
@@ -95,7 +98,7 @@ String userEmail="" ;
       //  tableData.add([value['chargingPointVendor'],value['chargingPointModel'],'available','0']);
        
     
-       
+      
         
         
       final mar=Marker(
@@ -112,7 +115,8 @@ String userEmail="" ;
          myMarker.add(mar);
 
           
-    });
+      }
+    );
        
        
     } catch (error) { 
@@ -221,111 +225,87 @@ getProfile()async{
         drawer: Drawer(
           child: ListView(
             children: [
-              //  Container(
-              //   child: Text(
-              //     "MENU",
-              //     style: TextStyle(
-              //         fontSize: 30,
-              //         fontWeight: FontWeight.bold,
-              //         color: Color.fromARGB(255, 15, 15, 15)),
-              //     ),
-              //     color: Color.fromRGBO(250, 226, 131, 1),
-              //     padding: EdgeInsets.only(left: 8.0),
-
-              //   ),
-                  
-              Container(
-                  padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top, bottom: 20),
-                  child: const Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 52,
+              UserAccountsDrawerHeader(
+                    accountName: Text(userName, style: TextStyle(fontSize:22)),
+                    accountEmail: Text(userEmail, style: TextStyle(fontSize:12)),
+                    currentAccountPicture: CircleAvatar(
+                        radius: 25,
                         child: const Icon(Icons.person_2_rounded),
                       ),
-                      SizedBox(
-                        height: 15,
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(10, 119, 208, 1),
                       ),
-                    
-                    
-                      
-                    ],
-                  )),
-                 Container(
-                       child: Text(userName, style: TextStyle(fontSize:30),textAlign:TextAlign.center),
 
-                    ),
-                    Container(
-                       child: Text(userEmail, style: TextStyle(fontSize:20),textAlign:TextAlign.center,)
-
-                    ),
-                  Container(
-                    child: TextButton(
-                      onPressed: () {
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.add_location),
+                    title: Text(
+                        'Stations Nearby',
+                        style: TextStyle(
+                            // decoration: TextDecoration.underline,
+                            color:Colors.black,
+                            fontSize: 23),
+                      ),
+                    onTap: () {
                         DatabaseReference ref =
                             FirebaseDatabase.instance.ref("users/123");
                         pushData(12, ref, socket);
                       },
-                      child: Text(
-                        'Stations Nearby',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            // decoration: TextDecoration.underline,
-                            color:Colors.white,
-                            fontSize: 23),
-                      ),
-                      style: ButtonStyle(),
-                    ),
                   ),
-                  Container(
-                    // padding:EdgeInsets.only(top: 625),
-                    child: TextButton(
-                      onPressed: () {
-                        mapUpdate();
-                      },
-                      child: Text(
-                        'Refresh',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                            // decoration: TextDecoration.underline,
-                            color: Colors.white,
-                            fontSize: 23),
-                      ),
-                      style: ButtonStyle(),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      mapnorm();
-                    },
-                    child: Text(
+                  
+                  ListTile(
+                    leading: Icon(Icons.compare_outlined),
+                    title: Text(
                       'Normal',
                       textAlign: TextAlign.left,
                       style: TextStyle(
                           // decoration: TextDecoration.underline,
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 23),
                     ),
-                    style: ButtonStyle(),
+                    onTap: mapnorm,
                   ),
-                  TextButton(
-                    onPressed: () {
-                      signOut();
-                    },
-                    child: Text(
+                  ListTile(
+                    leading: Icon(Icons.autorenew),
+                    title: Text(
+                        'Refresh',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                            // decoration: TextDecoration.underline,
+                            color: Colors.black,
+                            fontSize: 23),
+                      ),
+                      onTap: mapUpdate,
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.library_add_outlined),
+                    title: Text(
+                      'List a Charger',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          // decoration: TextDecoration.underline,
+                          color: Colors.black,
+                          fontSize: 23),
+                    ),
+                    onTap: addTodata,
+
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.exit_to_app),
+                    title: Text(
                       'Sign Out',
                       textAlign: TextAlign.left,
                       style: TextStyle(
                           // decoration: TextDecoration.underline,
-                          color:Colors.white,
+                          color:Colors.black,
                           fontSize: 23),
                     ),
-                    style: ButtonStyle(),
+                    onTap: signOut,
                   ),
                 ],
               
           ),
-          backgroundColor:Color.fromRGBO(10, 119, 208, 1),
+          backgroundColor:Color.fromRGBO(230, 224, 224, 1),
         ),
         body: Stack(children: [
           GoogleMap(

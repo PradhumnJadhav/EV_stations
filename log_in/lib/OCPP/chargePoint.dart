@@ -112,7 +112,7 @@ print(path);
          FloatingActionButton(
         onPressed: () {
           putDataCP(vendor,model,uid,rtdb);
-            Navigator.pushNamed(context, 'chargePointHome');
+            Navigator.pushNamed(context, 'SimpleMap');
         },
         child: Text('Add'),
       ),
