@@ -224,10 +224,11 @@ getProfile()async{
       
         drawer: Drawer(
           child: ListView(
+            padding: EdgeInsets.zero,
             children: [
               UserAccountsDrawerHeader(
                     accountName: Text(userName, style: TextStyle(fontSize:22)),
-                    accountEmail: Text(userEmail, style: TextStyle(fontSize:12)),
+                    accountEmail: Text(userEmail, style: TextStyle(fontSize:14)),
                     currentAccountPicture: CircleAvatar(
                         radius: 25,
                         child: const Icon(Icons.person_2_rounded),
@@ -256,7 +257,7 @@ getProfile()async{
                   ListTile(
                     leading: Icon(Icons.compare_outlined),
                     title: Text(
-                      'Normal',
+                      'Normal Map',
                       textAlign: TextAlign.left,
                       style: TextStyle(
                           // decoration: TextDecoration.underline,
@@ -290,6 +291,7 @@ getProfile()async{
                     onTap: addTodata,
 
                   ),
+                  Divider(),
                   ListTile(
                     leading: Icon(Icons.exit_to_app),
                     title: Text(
