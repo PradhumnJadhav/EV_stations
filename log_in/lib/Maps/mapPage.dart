@@ -245,7 +245,7 @@ getProfile()async{
                     ],
                   )),
                  Container(
-                       child: Text(userName, style: TextStyle(fontSize:40),textAlign:TextAlign.center),
+                       child: Text(userName, style: TextStyle(fontSize:30),textAlign:TextAlign.center),
 
                     ),
                     Container(
