@@ -24,7 +24,7 @@ final rtdb = FirebaseDatabase.instanceFor(
     databaseURL:
         'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
 
-final socket = WebSocket(Uri.parse('ws://172.20.25.116:9000/test1'),
+final socket = WebSocket(Uri.parse('ws://172.20.121.245:9000/test1'),
     timeout: Duration(seconds: 30));
 
 

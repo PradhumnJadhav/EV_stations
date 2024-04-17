@@ -23,9 +23,9 @@ final rtdb = FirebaseDatabase.instanceFor(
     databaseURL:
         'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
 
-final socket = WebSocket(Uri.parse('ws://172.20.25.116:9000/test1'),
-    timeout: Duration(seconds: 30));
 
+final socket = WebSocket(Uri.parse('ws://172.20.121.245:9000/test1'),
+    timeout: Duration(seconds: 30));
 
 
 
@@ -41,16 +41,13 @@ class _SimpleMapState extends State<SimpleMap> {
       target: LatLng(23.25941, 77.41225), zoom: 4, tilt: 0, bearing: 0);
 
   final TextEditingController _serverController = TextEditingController();
-
-
+ 
+ 
 String userName ="";
 String userEmail="" ;
 
   pushData(int data, DatabaseReference ref, WebSocket socket)async {
     socket.send('[2, "12345", "Authorize", { "idTag":"pradhumn"   }]');
-    socket.messages.listen((message) {
-      print(message);
-    });
    
 
     Navigator.pushNamed(context, 'chargePointHome');
@@ -66,6 +63,7 @@ String userEmail="" ;
   }
 
   mapsat() {
+    
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => SimpleMap1(),
@@ -217,6 +215,7 @@ getProfile()async{
         
       
         drawer: Drawer(
+          backgroundColor:Color.fromRGBO(230, 224, 224, 1),
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
@@ -285,6 +284,7 @@ getProfile()async{
                     onTap: addTodata,
 
                   ),
+                   
                   Divider(),
                   ListTile(
                     leading: Icon(Icons.exit_to_app),
@@ -301,7 +301,6 @@ getProfile()async{
                 ],
               
           ),
-          backgroundColor:Color.fromRGBO(230, 224, 224, 1),
         ),
         appBar: AppBar(
           title: const Text('EV Charging station',
@@ -314,6 +313,7 @@ getProfile()async{
           GoogleMap(
             initialCameraPosition: _kInitialPosition,
             mapType: MapType.normal,
+            
             markers: Set<Marker>.of(myMarker),
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
