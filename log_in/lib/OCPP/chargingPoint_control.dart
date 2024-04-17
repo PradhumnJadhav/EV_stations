@@ -22,12 +22,9 @@ import 'package:log_in/Helpers/ui_helper.dart';
 final firebaseApp = Firebase.app();
 final rtdb = FirebaseDatabase.instanceFor(app: firebaseApp, databaseURL: 'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
 
- final socket = WebSocket(Uri.parse('ws://172.20.32.55:9000/pj5'),
+ final socket = WebSocket(Uri.parse('ws://172.20.121.245:9000/pj5'),
     timeout: Duration(seconds: 30));
-
-final socket2 = WebSocket(Uri.parse('ws://172.20.32.55:9000/pj5'),
-    timeout: Duration(seconds: 30));
-
+ 
 class ChargePointControl extends StatefulWidget {
 
 // DatabaseReference ref = FirebaseDatabase.instance.ref('chargePoint');
@@ -159,8 +156,11 @@ if (model.exists && vendor.exists) {
         onPressed: () {
                   print(id.text.toString());
                   readData();
-                  if(data['chargingPointVendor']!="unknown" && data['chargingPointModel']!="unknown"  )
+                  if(data['chargingPointVendor']!="unknown" && data['chargingPointModel']!="unknown"  ){
+                    print('object');
              socket.send('[ 2,"12345", "BootNotification", {"chargePointVendor":"${data['chargingPointVendor']}", "chargePointModel": "${data['chargingPointModel']}"}]');
+             
+                  }
               socket.messages.listen((message) async{
                 
               DatabaseReference ref = FirebaseDatabase.instance.ref("chargePoint/${id.text.toString()}");
@@ -216,7 +216,7 @@ if (model.exists && vendor.exists) {
                    
              
               });
-              (socket.send('[2,"12345", "StopTransaction", { "connectorId":0 , "idTag":"${userName}"  ,"meterStop":${int.parse(meter.text.toString())},"timestamp":"0" ,    transaction_id: 1}]'));
+              (socket.send('[2,"12345", "StopTransaction", {   "idTag":"${userName}"  ,"meterStop":${int.parse(meter.text.toString())},"timestamp":"0" ,"transactionId":1 ,"reason":"Other"}]'));
                     socket.messages.listen((message) async{
                             print(message);
 

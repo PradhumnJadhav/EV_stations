@@ -9,7 +9,7 @@ import 'package:web_socket_client/web_socket_client.dart';
 final firebaseApp = Firebase.app();
 final rtdb = FirebaseDatabase.instanceFor(app: firebaseApp, databaseURL: 'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
 
-final socket = WebSocket(Uri.parse('ws://172.20.32.55:9000/test1'),
+final socket = WebSocket(Uri.parse('ws://172.20.121.245:9000/test1'),
     timeout: Duration(seconds: 30));
 
 

@@ -15,7 +15,7 @@ final rtdb = FirebaseDatabase.instanceFor(app: firebaseApp, databaseURL: 'https:
 
 final ref = FirebaseDatabase.instance.ref();
 
-final socket = WebSocket(Uri.parse('ws://172.20.32.55:9000/pj5'),
+final socket = WebSocket(Uri.parse('ws://172.20.121.245:9000/pj5'),
     timeout: Duration(seconds: 30));
 
  class ChargePointHome extends StatefulWidget {
@@ -31,7 +31,7 @@ class _ChargePointHome extends State<ChargePointHome> {
   
   void initState() { 
     super.initState(); 
-     addTo();
+     
   readData();  
   } 
   
@@ -65,7 +65,7 @@ class _ChargePointHome extends State<ChargePointHome> {
  
 
 
-   addTo()async{
+   
    
             // final ref = FirebaseDatabase.instance.ref();
 //     final vendorname = await ref.child('chargePoint/pj1/chargingPointVendor').get();
@@ -86,29 +86,8 @@ class _ChargePointHome extends State<ChargePointHome> {
 //             tableData.add([  vendorname.value.toString() ,modelname.value.toString(), 'Unavailable', '0 kWh']);
           
 
-  var url = "https://my-project-1579067571295-default-rtdb.firebaseio.com/"+"user.json"; 
-   
-   final user =  await FirebaseAuth.instance.currentUser;
-         userEmail="${user?.email}";
-    try { 
-      final response = await http.get(Uri.parse(url)); 
-      final extractedData = json.decode(response.body) as Map<String, dynamic>; 
-      if (extractedData == null) { 
-        return; 
-      } 
-      extractedData.forEach((key, value) { 
-        
-        if(value['email']== userEmail){
-          print(userEmail);
-        }
-      }); 
-      setState(() { 
-        isLoading = false; 
-      }); 
-    } catch (error) { 
-      throw error;
-    } 
-  } 
+
+
 
  
 @override
@@ -125,9 +104,7 @@ class _ChargePointHome extends State<ChargePointHome> {
             columns: List.generate(
               4,
               (index) => DataColumn(
-                label: TextButton( child:Text(tableData[0][index]),onPressed: () {
-                  
-                }, ),
+                label: Text(tableData[0][index]), 
               ),
             ),
             rows: List.generate(
@@ -136,38 +113,9 @@ class _ChargePointHome extends State<ChargePointHome> {
                 cells: List.generate(
                   tableData[rowIndex + 1].length,
                   (cellIndex) => DataCell(
-                    TextButton(onPressed:(){
-             
-              socket.send('[2, "12345", "Authorize", { "idTag":"${userEmail}"   }]');
-              socket.messages.listen((message) async{
-               
-           showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-          
-            title: Text("recieving message.."),
-            actions: [
-              Container(
-                // color: const Color.fromARGB(255, 255, 21, 21),
-                child:
-                         TextButton(
-                
-                 child: Text( (message.toString().contains('Accepted') ? 'Accepted' : 'Rejected') +" Now connect to plugd" ),
-                 onPressed:  () {
-                  
-                  }
+                    Text ( 
                    
-              ),
-              ),
-            ],
-          );
-        }  );
-              }
-              );
-
-
-                    } ,child: Text(tableData[rowIndex + 1][cellIndex]),),
+                (tableData[rowIndex + 1][cellIndex]),),
                   ),
                 ),
               ),
@@ -175,13 +123,7 @@ class _ChargePointHome extends State<ChargePointHome> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-           
-             Navigator.pushNamed(context, 'chargePoint');
-           },
-        child: Icon(Icons.dangerous),
-      ),
+      
       
     );
   }
