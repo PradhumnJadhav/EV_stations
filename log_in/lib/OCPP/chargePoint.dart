@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:log_in/OCPP/chargingPoint_control.dart';
  
 final firebaseApp = Firebase.app();
 final rtdb = FirebaseDatabase.instanceFor(app: firebaseApp, databaseURL: 'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
@@ -13,15 +14,22 @@ class ChargePoint extends StatefulWidget {
 
 class _ChargePoint extends State<ChargePoint> {
 putDataCP( TextEditingController vendor ,TextEditingController model,TextEditingController uid,FirebaseDatabase rtdb)async{
+
+if(uid.text.toString()=="" ||  model.text.toString()=="" || vendor.text.toString()=="" ){
+  print("hiii");
+  return ;}
+
+
 final data={
-  "uid": uid.text.toString(),
+  "uid":    uid.text.toString(),
 "chargingPointVendor":vendor.text.toString(),
 "chargingPointModel":model.text.toString(),
 "lattitde":   (lattitude.text.toString()),
 "longitude":  longitude.text.toString(),
+'status':'unavailable'
 
 };
-String  path='chargePoint/' + (uid.text.toString()) ;
+String  path='chargePoint/'  + (uid.text.toString()) ;
 
 DatabaseReference ref = FirebaseDatabase.instance.ref(path);
 await ref.set(data);
@@ -33,6 +41,7 @@ print(path);
   TextEditingController uid=         TextEditingController();
   TextEditingController lattitude=   TextEditingController();
   TextEditingController longitude=   TextEditingController();
+
 
 @override
   Widget build(BuildContext context) {
@@ -84,6 +93,7 @@ print(path);
                                 )),
                           ),
                            TextField(
+                            
                             controller:lattitude,
                             style: TextStyle(),
                             obscureText: false,
@@ -112,7 +122,7 @@ print(path);
          FloatingActionButton(
         onPressed: () {
           putDataCP(vendor,model,uid,rtdb);
-            Navigator.pushNamed(context, 'chargePointHome');
+            Navigator.pushNamed(context, 'charingPointControl');
         },
         child: Text('Add'),
       ),

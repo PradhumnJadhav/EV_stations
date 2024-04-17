@@ -22,9 +22,9 @@ final rtdb = FirebaseDatabase.instanceFor(
     databaseURL:
         'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
 
+
 final socket = WebSocket(Uri.parse('ws://172.20.25.116:9000/test1'),
     timeout: Duration(seconds: 30));
-
 
 
 
@@ -41,15 +41,12 @@ class _SimpleMapState extends State<SimpleMap> {
 
   final TextEditingController _serverController = TextEditingController();
 
-
+MapType  mapType= MapType.normal;
 String userName ="";
 String userEmail="" ;
 
   pushData(int data, DatabaseReference ref, WebSocket socket)async {
     socket.send('[2, "12345", "Authorize", { "idTag":"pradhumn"   }]');
-    socket.messages.listen((message) {
-      print(message);
-    });
    
 
     Navigator.pushNamed(context, 'chargePointHome');
@@ -65,6 +62,7 @@ String userEmail="" ;
   }
 
   mapsat() {
+    mapType=MapType.satellite;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (_) => SimpleMap1(),
@@ -292,6 +290,7 @@ getProfile()async{
                   TextButton(
                     onPressed: () {
                       mapsat();
+                        // mapType=MapType.satellite;
                     },
                     child: Text(
                       'Satellite',
@@ -325,7 +324,7 @@ getProfile()async{
         body: Stack(children: [
           GoogleMap(
             initialCameraPosition: _kInitialPosition,
-            mapType: MapType.normal,
+            mapType: mapType,
             markers: Set<Marker>.of(myMarker),
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
