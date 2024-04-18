@@ -26,7 +26,7 @@ final socket = WebSocket(Uri.parse('ws://172.20.121.245:9000/pj5'),
 class _ChargePointHome extends State<ChargePointHome> {
  String userEmail="";
  List<List<String>> tableData = [
- ['chargingPointVendor', 'chargingPointModel', 'Status', 'EnergyUsed'],
+ ['chargingPointVendor', 'chargingPointModel', 'Status', 'Power Rating (KW)'],
   ];
   
   void initState() { 
@@ -52,7 +52,7 @@ class _ChargePointHome extends State<ChargePointHome> {
         return; 
       } 
       extractedData.forEach((key, value) { 
-       tableData.add([value['chargingPointVendor'].toString(),value['chargingPointModel'].toString(),value['status'],'0']);
+       tableData.add([value['chargingPointVendor'].toString(),value['chargingPointModel'].toString(),value['status'],value['rating']]);
       }); 
       setState(() { 
         isLoading = false; 
