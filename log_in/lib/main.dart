@@ -11,6 +11,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:log_in/splash_screen.dart';
 import 'package:log_in/Maps/mapPage.dart';
 import 'package:log_in/OCPP/chargePoint.dart';
+//import 'package:log_in/Maps/info.dart';
  
 import 'package:log_in/OCPP/chargePointHome.dart';
 void main() async {
@@ -30,7 +31,7 @@ void main() async {
       'chargePoint' :(context) => ChargePoint(),
       'chargePointHome' :(context) => ChargePointHome(),
       'SimpleMap' :(context) => SimpleMap(),
-      
+      //'stationPage': (context)=> StationPage(),
     },
     supportedLocales: L10n.all,
     localizationsDelegates: [
