@@ -144,9 +144,10 @@ if (model.exists && vendor.exists) {
         body: Column  (
 
           children:[ TextField(
-            
+             
         controller: id,
         textAlign: TextAlign.center,
+         decoration: InputDecoration(hintText: "enter charge point uid "),
       ),
              TextButton(
               
@@ -200,33 +201,84 @@ if (model.exists && vendor.exists) {
         )
      
       ),
-      TextField(
+  //      TextButton(onPressed:(){
+
+  //          socket.send([ 2,"12345", "StatusNotification", {
+  //  "connectorId": 1,"errorCode": "NoError","status": "Preparing","timestamp": "2022-06-12T09:13:00.515Z"}]);
+  //       socket.messages.listen((message) async{
+  //                  print("Status sent");
+                  
+             
+  //             });
+  //      }
+  //    , child:Text('Send Status Notification',
+  //                   textAlign: TextAlign.left,
+  //                                 style: TextStyle(
+  //                                     decoration: TextDecoration.none,
+  //                                     color: Color.fromARGB(255, 255, 0, 0),
+  //                                     fontSize: 18),
+  //                               ),
+    //  ),
+      // TextField(
             
-        controller: meter,
-        textAlign: TextAlign.center,
-      ),
+      //   controller: meter,
+      //   textAlign: TextAlign.center,
+      // ),
+     
+
+      
      TextButton(onPressed:(){
         getProfile();
+        
+         print('Transaction started ....');
+                   
        socket.send('[ 2,"12345", "StartTransaction", { "connectorId":0 , "idTag":"${userName}"  ,"meterStart":0,"timestamp":"0" }]');
         socket.messages.listen((message) async{
                    print(message);
                    if(message.toString().contains('Accepted') ){
-                     print('Transaction started ....');
+                     
                    }  
-                   
+                  
              
               });
-              (socket.send('[2,"12345", "StopTransaction", {   "idTag":"${userName}"  ,"meterStop":${int.parse(meter.text.toString())},"timestamp":"0" ,"transactionId":1 ,"reason":"Other"}]'));
-                    socket.messages.listen((message) async{
-                            print(message);
-
-                    });
+             
 
      }
             
      , child:Text('Start Transaction'),
 
      ),
+  TextButton(onPressed:(){
+int meterStop=0;
+
+          for(int i=0;i<10 ;i++){
+            for(int j=0;j<100000000;j++ ){
+
+             
+            } meterStop++;
+          }
+            (socket.send('[2,"12345", "StopTransaction", {   "idTag":"$userName"  ,"meterStop":$meterStop,"timestamp":"0" ,"transactionId":1 ,"reason":"Other"}]'));
+                    socket.messages.listen((message) async{
+                            print(message);
+
+                    });
+       }
+     , child:Text('Stop  Transaction',
+                    textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      decoration: TextDecoration.none,
+                                      color: Color.fromARGB(255, 255, 0, 0),
+                                      fontSize: 18),
+                                ),
+     ),
+      // TextField(
+            
+      //   controller: meter,
+      //   textAlign: TextAlign.center,
+      // ),
+     
+
+     
         TextButton(
         onPressed: () {
           
