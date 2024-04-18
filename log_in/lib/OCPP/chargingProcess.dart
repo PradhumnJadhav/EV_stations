@@ -1,6 +1,3 @@
- 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,21 +9,19 @@ import 'package:web_socket_client/web_socket_client.dart';
 final firebaseApp = Firebase.app();
 final rtdb = FirebaseDatabase.instanceFor(app: firebaseApp, databaseURL: 'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
 
-
-final ref = FirebaseDatabase.instance.ref();
-
-final socket = WebSocket(Uri.parse('ws://172.20.121.245:9000/pj5'),
+final socket = WebSocket(Uri.parse('ws://172.20.121.245:9000/test1'),
     timeout: Duration(seconds: 30));
 
- class ChargePointHome extends StatefulWidget {
+
+ class _ChargePointProcess extends StatefulWidget {
   @override
-  _ChargePointHome createState() => _ChargePointHome();
+  __ChargePointProcess createState() => __ChargePointProcess ();
 }
 
-class _ChargePointHome extends State<ChargePointHome> {
- String userEmail="";
+class __ChargePointProcess extends State<_ChargePointProcess > {
+  final uid='pj5';
  List<List<String>> tableData = [
- ['chargingPointVendor', 'chargingPointModel', 'Status', 'EnergyUsed'],
+ ['uid', 'name', 'Email', 'time'],
   ];
   
   void initState() { 
@@ -50,10 +45,15 @@ class _ChargePointHome extends State<ChargePointHome> {
       final extractedData = json.decode(response.body) as Map<String, dynamic>; 
       if (extractedData == null) { 
         return; 
+        
       } 
       extractedData.forEach((key, value) { 
+        if(value['uid']==uid){
+
+             
+
        tableData.add([value['chargingPointVendor'].toString(),value['chargingPointModel'].toString(),value['status'],'0']);
-      }); 
+    }}); 
       setState(() { 
         isLoading = false; 
       }); 
@@ -65,7 +65,7 @@ class _ChargePointHome extends State<ChargePointHome> {
  
 
 
-   
+   addToTable()async{
    
             // final ref = FirebaseDatabase.instance.ref();
 //     final vendorname = await ref.child('chargePoint/pj1/chargingPointVendor').get();
@@ -87,7 +87,7 @@ class _ChargePointHome extends State<ChargePointHome> {
           
 
 
-
+}
 
  
 @override
@@ -104,7 +104,7 @@ class _ChargePointHome extends State<ChargePointHome> {
             columns: List.generate(
               4,
               (index) => DataColumn(
-                label: Text(tableData[0][index]), 
+                label: Text( tableData[0][index] ),
               ),
             ),
             rows: List.generate(
@@ -113,9 +113,7 @@ class _ChargePointHome extends State<ChargePointHome> {
                 cells: List.generate(
                   tableData[rowIndex + 1].length,
                   (cellIndex) => DataCell(
-                    Text ( 
-                   
-                (tableData[rowIndex + 1][cellIndex]),),
+                    Text(tableData[rowIndex + 1][cellIndex]),
                   ),
                 ),
               ),
@@ -123,7 +121,13 @@ class _ChargePointHome extends State<ChargePointHome> {
           ),
         ),
       ),
-      
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          addToTable();
+             Navigator.pushNamed(context, 'chargePoint');
+           },
+        child: Icon(Icons.dangerous),
+      ),
       
     );
   }
