@@ -52,7 +52,7 @@ class _ChargePointHome extends State<ChargePointHome> {
         return; 
       } 
       extractedData.forEach((key, value) { 
-       tableData.add([value['chargingPointVendor'].toString(),value['chargingPointModel'].toString(),value['status'],'0']);
+       tableData.add([value['chargingPointVendor'].toString(),value['chargingPointModel'].toString(),value['status'],value['rating']]);
       }); 
       setState(() { 
         isLoading = false; 
