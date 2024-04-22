@@ -22,7 +22,7 @@ import 'package:log_in/Helpers/ui_helper.dart';
 final firebaseApp = Firebase.app();
 final rtdb = FirebaseDatabase.instanceFor(app: firebaseApp, databaseURL: 'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
 
- final socket = WebSocket(Uri.parse('ws://172.20.121.245:9000/pj5'),
+ final socket = WebSocket(Uri.parse('ws:// 172.20.60.16:9000/pj5'),
     timeout: Duration(seconds: 30));
  
 class ChargePointControl extends StatefulWidget {
