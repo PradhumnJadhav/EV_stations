@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:log_in/Maps/mapPage.dart';
 import 'package:log_in/Maps/mapPage2.dart';
 import 'package:log_in/payment_config.dart';
 import 'package:web_socket_channel/io.dart';
@@ -51,7 +52,7 @@ final rtdb = FirebaseDatabase.instanceFor(
     databaseURL:
         'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
 
-final socket = WebSocket(Uri.parse('ws://172.20.25.116:9000/test1'),
+final socket = WebSocket(Uri.parse('ws:// 172.20.60.16:9000/test1'),
     timeout: Duration(seconds: 30));
 
 class SimpleMap1 extends StatefulWidget {
@@ -70,6 +71,48 @@ class _SimpleMapState extends State<SimpleMap1> {
   String userName = "";
   String userEmail = "";
 
+ getDetails() async {
+ 
+try{
+
+ String f = 'https://api.openchargemap.io/v3/poi/?output=json&key=d3a438d6-7b1a-4e83-9d8b-89288831649e&countrycode=IN&maxresults=300';
+ 
+ final response = await http.get(Uri.parse(f) , headers:  {'User-Agent':'me' , }); 
+ final extractedData = jsonDecode(response.body)  ;  
+     BitmapDescriptor markerIcon = await BitmapDescriptor.fromAssetImage(
+        const ImageConfiguration(), 'assets/charging.png');
+
+  int n=300;
+  for(int i=0;i<n;i++){
+      final uid = extractedData[i]['AddressInfo']['Title'];
+      final latitude= extractedData[i]['AddressInfo']['Latitude'];
+      final longitude=extractedData[i]['AddressInfo']['Longitude'];
+      final powerKW=extractedData[i]['Connections'][0]['PowerKW'];
+      final status=extractedData[i]['StatusType']["IsOperational"];
+       final mar = Marker(
+            onTap: () {
+              _showBottomSheet(context ,uid.toString(), powerKW.toString(),status.toString());
+            },
+            markerId: MarkerId(uid),
+            position: LatLng( latitude,
+                 longitude,
+                ),
+           icon:markerIcon,
+           infoWindow: InfoWindow(
+            title: uid.toString(),
+           ),
+
+       );
+            
+        myMarker.add(mar);
+
+  }}
+  catch (error) {
+       print(error);
+        }
+  
+   
+}
   pushData(int data, DatabaseReference ref, WebSocket socket) async {
     socket.send('[2, "12345", "Authorize", { "idTag":"pradhumn"   }]');
     socket.messages.listen((message) {
@@ -91,7 +134,7 @@ class _SimpleMapState extends State<SimpleMap1> {
   mapsat() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => SimpleMap1(),
+        builder: (_) => SimpleMap(),
       ),
     );
   }
@@ -124,7 +167,7 @@ class _SimpleMapState extends State<SimpleMap1> {
 
         final mar = Marker(
             onTap: () {
-              _showBottomSheet(context);
+              _showBottomSheet(context , " Pranab" , '10KW' , "Available");
             },
             markerId: MarkerId(value['uid']),
             position: LatLng(double.parse(value['lattitde'].toString()),
@@ -136,10 +179,10 @@ class _SimpleMapState extends State<SimpleMap1> {
         myMarker.add(mar);
       });
     } catch (error) {
-      throw error;
+      print(error);
     }
 
-    return mark;
+     
   }
 
   getProfile() async {
@@ -158,7 +201,7 @@ class _SimpleMapState extends State<SimpleMap1> {
         }
       });
     } catch (error) {
-      throw error;
+      print( error);
     }
   }
 
@@ -172,6 +215,7 @@ class _SimpleMapState extends State<SimpleMap1> {
     myMarker.addAll(markerList);
     packdata();
     getProfile();
+    getDetails();
   }
 
   Future<Position> getUserLocation() async {
@@ -253,7 +297,7 @@ class _SimpleMapState extends State<SimpleMap1> {
                       color: Colors.black,
                       fontSize: 23),
                 ),
-                onTap: mapsat,
+                onTap:mapsat,
               ),
               ListTile(
                 leading: Icon(Icons.autorenew),
@@ -265,7 +309,7 @@ class _SimpleMapState extends State<SimpleMap1> {
                       color: Colors.black,
                       fontSize: 23),
                 ),
-                onTap: mapUpdate,
+                   
               ),
               ListTile(
                 leading: Icon(Icons.library_add_outlined),
@@ -308,7 +352,7 @@ class _SimpleMapState extends State<SimpleMap1> {
         body: Stack(children: [
           GoogleMap(
             initialCameraPosition: _kInitialPosition,
-            mapType: MapType.satellite,
+            mapType: MapType.hybrid,
             markers: Set<Marker>.of(myMarker),
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
@@ -328,7 +372,7 @@ class _SimpleMapState extends State<SimpleMap1> {
   }
 }
 
-void _showBottomSheet(BuildContext context) {
+void _showBottomSheet(BuildContext context , String name,String  power ,String status) {
   showModalBottomSheet(
     context: context,
     shape: RoundedRectangleBorder(
@@ -349,20 +393,22 @@ void _showBottomSheet(BuildContext context) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Station Name: ',
+              'Station Name: $name',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 30),
             Text(
-              'Power: Insert Power Value Here', // Replace with actual power value
+              'Power: $power', // Replace with actual power value
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 30),
             Text(
-              'Energy Remaining:  kWh',
+              'Status:  $status',
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 30),
+            TextButton(onPressed: ()=> {} , child: Text('Reserve a slot')),
+             
             Expanded(
               child: Align(
                   alignment: Alignment.bottomCenter, child: googlePayButton),

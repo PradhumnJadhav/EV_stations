@@ -27,7 +27,7 @@ void main() async {
       'login': (context) => MyLogin(),
       'register': (context) => MyRegister(),
       'splash_screen': (context) => Mysplash(),
-      'flutter': (context) => HomePage(title: 'flutter'),
+      
       'map': (context) => SimpleMap(),
       'resetPassword': (context) => ResetPasswordPage(),
       'chargePoint': (context) => ChargePoint(),

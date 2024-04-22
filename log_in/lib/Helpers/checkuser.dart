@@ -19,9 +19,7 @@ class _CheckUserState extends State<CheckUser> {
   checkuser() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      return HomePage(
-        title: 'flutter'
-      );
+       
     }
     else{
       return MyLogin();

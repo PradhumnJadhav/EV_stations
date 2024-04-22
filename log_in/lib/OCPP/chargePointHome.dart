@@ -15,7 +15,7 @@ final rtdb = FirebaseDatabase.instanceFor(app: firebaseApp, databaseURL: 'https:
 
 final ref = FirebaseDatabase.instance.ref();
 
-final socket = WebSocket(Uri.parse('ws://172.20.121.245:9000/pj5'),
+final socket = WebSocket(Uri.parse('ws:// 172.20.60.16:9000/pj5'),
     timeout: Duration(seconds: 30));
 
  class ChargePointHome extends StatefulWidget {
@@ -31,12 +31,37 @@ class _ChargePointHome extends State<ChargePointHome> {
   
   void initState() { 
     super.initState(); 
-     
+     getDetails();
   readData();  
   } 
   
   bool isLoading = true; 
  
+ getDetails() async {
+ 
+try{
+
+ String f = 'https://api.openchargemap.io/v3/poi/?output=json&key=d3a438d6-7b1a-4e83-9d8b-89288831649e&countrycode=IN&maxresults=5';
+ 
+ final response = await http.get(Uri.parse(f) , headers:  {'User-Agent':'me' , }); 
+ final extractedData = jsonDecode(response.body)  ;  
+  int n=5;
+  for(int i=0;i<n;i++){
+      final uid = extractedData[i]['AddressInfo']['Title'];
+      final model=extractedData[i]['Connections'][0]['CurrentType'] ;
+      final powerKW=extractedData[i]['Connections'][0]['PowerKW'];
+      final status=extractedData[i]['StatusType']["IsOperational"];
+print(uid);
+       tableData.add([ uid.toString(), model.toString(), status ? "Available" : "Unavailable", powerKW.toString()]);
+      
+  }}
+  catch (error) {
+       print(error);
+        }
+  
+   
+}
+
   Future<void> readData() async { 
       
     // Please replace the Database URL 
@@ -49,16 +74,16 @@ class _ChargePointHome extends State<ChargePointHome> {
       final response = await http.get(Uri.parse(url)); 
       final extractedData = json.decode(response.body) as Map<String, dynamic>; 
       if (extractedData == null) { 
-        return; 
+        return ; 
       } 
       extractedData.forEach((key, value) { 
-       tableData.add([value['chargingPointVendor'].toString(),value['chargingPointModel'].toString(),value['status'],value['rating']]);
+       tableData.add([value['chargingPointVendor'].toString(),value['chargingPointModel'].toString(),value['status'].toString(),value['rating'].toString()]);
       }); 
       setState(() { 
         isLoading = false; 
       }); 
     } catch (error) { 
-      throw error;
+      print(error);
     } 
   } 
 
@@ -96,7 +121,9 @@ class _ChargePointHome extends State<ChargePointHome> {
         appBar: AppBar(
           title: Text('Charge Points Nearby'),
         ),
-       body: SingleChildScrollView(
+       body:Column(
+       children:[
+        SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -123,8 +150,9 @@ class _ChargePointHome extends State<ChargePointHome> {
           ),
         ),
       ),
-      
-      
+       
+      //  TextButton(onPressed:  , child: Text('refresh'))
+       ])
     );
   }
 }

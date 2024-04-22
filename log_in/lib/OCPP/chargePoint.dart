@@ -26,7 +26,8 @@ final data={
 "chargingPointModel":model.text.toString(),
 "lattitde":   (lattitude.text.toString()),
 "longitude":  longitude.text.toString(),
-'status':'unavailable'
+'status':'unavailable',
+'rating':'10'
 
 };
 String  path='chargePoint/'  + (uid.text.toString()) ;

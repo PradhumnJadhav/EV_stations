@@ -12,7 +12,7 @@ final firebaseApp = Firebase.app();
 final rtdb = FirebaseDatabase.instanceFor(
     app: firebaseApp,
     databaseURL:
-        'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
+        'https://my-project-1579067571295-default-rtdb.firebaseio.com');
 class MyRegister extends StatefulWidget {
   const MyRegister({Key? key}) : super(key: key);
 

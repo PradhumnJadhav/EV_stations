@@ -66,34 +66,19 @@ import 'package:http/http.dart' as http;
 //     );
 //   }
 // }
- 
- 
-import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_core/firebase_core.dart';
- 
+
+
 import 'package:charge_points/charge_points.dart';
 
-
-
-extendProfile(String email,String name)async{
- final firebaseApp = Firebase.app();
-final rtdb = FirebaseDatabase.instanceFor(
-    app: firebaseApp,
-    databaseURL:
-        'https://my-project-1579067571295-default-rtdb.firebaseio.com/');
-
-  String  path='user/' + name  ;
-
-DatabaseReference ref = FirebaseDatabase.instance.ref(path);
-
-await ref.set({'name':name ,'email':email});
-}
+void main() async {
+ 
+ String f = 'https://api.openchargemap.io/v3/poi/?output=json&key=d3a438d6-7b1a-4e83-9d8b-89288831649e&countrycode=IN&maxresults=2';
+ final response = await http.get(Uri.parse(f) , headers:  {'User-Agent':'me' , }); 
+  int len=response.body.length;
+   String  data=response.body.substring(1,len-1);
+   print(response.body);
+     final extractedData = jsonDecode(data) ;  
+  //  print(extractedData.runtimeType);
+ 
   
-  void main()async{
-     print("hhii");
-    extendProfile('pradhumn@gmail.com', 'Pradhumn');
-    print("hhii");
-
-  }
+}
